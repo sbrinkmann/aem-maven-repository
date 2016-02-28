@@ -4,7 +4,7 @@
     <groupId>io.brinkmann.aem.maven</groupId>
     <artifactId>aem-maven-repository</artifactId>
     <packaging>bundle</packaging>
-    <version>1.0</version>
+    <version>1.1-SNAPSHOT</version>
     <name>AEM Maven Repository</name>
 
     <properties>
