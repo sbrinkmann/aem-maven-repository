@@ -20,7 +20,7 @@ Even when this plugin isn't tested on AEM 6.0 or AEM 5.x, it's quite possible th
 
 The AEM Maven Repository provides two web interfaces. The first one generates a POM file which represents all OSGi bundles running inside Apache Felix. The second provides access as a Maven repository.
  
-### Access Maven POM file
+##### Access Maven POM file
 
 - Quick Access
   http://localhost:4502/bin/maven/dependencies.xml
@@ -29,7 +29,7 @@ The AEM Maven Repository provides two web interfaces. The first one generates a 
 - Adjust group ID, artifact ID and version number (e.g. my.group.id:aem-base:6.1)
   http://localhost:4502/bin/maven/dependencies.xml?groupId=my.group.id&artifactId=aem-base&version=6.1
 
-### Access Maven Repository
+##### Access Maven Repository
 
 Add the following part to your POM file. Adjust the _<url>_ in case your instance doesn't run on localhost or another port.
 ```
@@ -61,7 +61,7 @@ Add the following part to your POM file. Adjust the _<url>_ in case your instanc
  </pluginRepositories>
 ```
 
-#### Set AEM Admin Credentials in _.m2/settings.xml_
+##### Set AEM Admin Credentials in _.m2/settings.xml_
 
 Adjust the password, in case changed the admin password
 ```
