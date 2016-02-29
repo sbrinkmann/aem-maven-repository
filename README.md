@@ -11,9 +11,10 @@ Even when this plugin isn't tested on AEM 6.0 or AEM 5.x, it's quite possible th
 
 - Download the latest aem-maven-repository jar file from https://github.com/sbrinkmann/aem-maven-repository/releases
 - Go to the Apache Felix Console http://<aem-hostname>:<4502|4503>/system/console/bundles
-- Select _Install or Update_ and select the just downloaded aem-maven-repository jar file
+- Select _Install or Update_
+- Select the just downloaded aem-maven-repository jar file with the file picker
 - Tick the _Start Bundle_ checkbox
-- Hit _Install or Update_ to finish the deployment
+- Hit _Install or Update_ button to finish the deployment
 
 ## Access
 
