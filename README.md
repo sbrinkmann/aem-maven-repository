@@ -23,11 +23,11 @@ The AEM Maven Repository provides two web interfaces. The first one generates a 
 ##### Access Maven POM file
 
 - Quick Access<br>
-  [http://localhost:4502/bin/maven/dependencies.xml](http://localhost:4502/bin/maven/dependencies.xml)
+  http://localhost:4502/bin/maven/dependencies.xml
 - Access the List of Dependencies Only<br>
-  [http://localhost:4502/bin/maven/dependencies.xml?dependenciesOnly=true](http://localhost:4502/bin/maven/dependencies.xml?dependenciesOnly=true)
+  http://localhost:4502/bin/maven/dependencies.xml?dependenciesOnly=true
 - Adjust group ID, artifact ID and version number (e.g. my.group.id:aem-base:6.1)<br>
-  [http://localhost:4502/bin/maven/dependencies.xml?groupId=my.group.id&artifactId=aem-base&version=6.1](http://localhost:4502/bin/maven/dependencies.xml?groupId=my.group.id&artifactId=aem-base&version=6.1)
+  http://localhost:4502/bin/maven/dependencies.xml?groupId=my.group.id&artifactId=aem-base&version=6.1
 
 ##### Access Maven Repository
 
