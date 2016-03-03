@@ -19,8 +19,6 @@ public class ArtifactInformation implements Comparable<ArtifactInformation> {
 
     private String artifactComment = "";
 
-    private String artifactFilename = "";
-
     private Bundle associatedBundle;
 
     public ArtifactInformation() {
@@ -132,14 +130,6 @@ public class ArtifactInformation implements Comparable<ArtifactInformation> {
         mavenMetadata.write("</metadata>");
 
         return mavenMetadata.toString();
-    }
-
-    public String getArtifactFilename() {
-        return artifactFilename;
-    }
-
-    public void setArtifactFilename(String artifactFilename) {
-        this.artifactFilename = artifactFilename;
     }
 
     public Bundle getAssociatedBundle() {

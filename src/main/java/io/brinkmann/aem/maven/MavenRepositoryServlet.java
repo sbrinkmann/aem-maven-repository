@@ -62,7 +62,7 @@ public class MavenRepositoryServlet extends HttpServlet {
 
             ArtifactInformation artifactFromApacheFelix = lookupArtifactInApacheFelix(fromRequestResolvedArtifactInformation);
 
-            String fileExtension = FilenameUtils.getExtension(fromRequestResolvedArtifactInformation.getArtifactFilename());
+            String fileExtension = FilenameUtils.getExtension(request.getRequestURI());
 
             switch (fileExtension) {
                 case "pom":
@@ -145,12 +145,10 @@ public class MavenRepositoryServlet extends HttpServlet {
         String groupId = StringUtils.join(groupIdParts, ".");
         String artifactId = artifactRequestInformationParts.get(artifactRequestInformationParts.size() - 3);
         String version = artifactRequestInformationParts.get(artifactRequestInformationParts.size() - 2);
-        String filename = artifactRequestInformationParts.get(artifactRequestInformationParts.size() - 1);
 
         artifactInformation.setGroupId(groupId);
         artifactInformation.setArtifactId(artifactId);
         artifactInformation.setVersion(version);
-        artifactInformation.setArtifactFilename(filename);
 
         return artifactInformation;
     }

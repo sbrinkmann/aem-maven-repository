@@ -136,7 +136,7 @@ public class POMGeneratorImpl implements POMGenerator {
             if (ignoreBundleFromExport(bundle.getSymbolicName())) {
                 LOGGER.trace("Ignore OSGi Bundle [" + bundle.getSymbolicName() + "] from export.");
             } else if (bundleIsFragment) {
-                ArtifactInformation dependency = new ArtifactInformation(bundle.getSymbolicName() + " (Bundle ID:" + bundle.getBundleId() + ") [skipped because it's a fragment]");
+                ArtifactInformation dependency = new ArtifactInformation(bundle.getSymbolicName() + " [skipped because it's a fragment]");
                 dependencies.add(dependency);
             } else if (pomResourcesInBundle == null) {
                 if (artifactMappings.containsKey(bundle.getSymbolicName())) {
@@ -145,16 +145,16 @@ public class POMGeneratorImpl implements POMGenerator {
                     String version = StringUtils.isNotEmpty(artifactMapping.getVersion()) ? artifactMapping.getVersion() : bundle.getVersion().toString();
                     String artifactId = StringUtils.isNotEmpty(artifactMapping.getArtifactId()) ? artifactMapping.getArtifactId() : bundle.getSymbolicName();
                     String groupId = artifactMapping.getGroupId();
-                    String artifactComment = bundle.getSymbolicName() + " (Bundle ID:" + bundle.getBundleId() + ")";
+                    String artifactComment = bundle.getSymbolicName();
 
                     ArtifactInformation dependency = new ArtifactInformation(groupId, artifactId, version, artifactComment, bundle);
                     dependencies.add(dependency);
                 } else {
-                    ArtifactInformation dependency = new ArtifactInformation(bundle.getSymbolicName() + " (Bundle ID:" + bundle.getBundleId() + ") [skipped because of missing pom properties]");
+                    ArtifactInformation dependency = new ArtifactInformation(bundle.getSymbolicName() + " [skipped because of missing pom properties]");
                     dependencies.add(dependency);
                 }
             } else if (!bundleExportsPackages) {
-                ArtifactInformation dependency = new ArtifactInformation(bundle.getSymbolicName() + " (Bundle ID:" + bundle.getBundleId() + ") [skipped due to no exports]");
+                ArtifactInformation dependency = new ArtifactInformation(bundle.getSymbolicName() + " [skipped due to no exports]");
                 dependencies.add(dependency);
             } else {
                 while (pomResourcesInBundle.hasMoreElements()) {
@@ -165,7 +165,7 @@ public class POMGeneratorImpl implements POMGenerator {
                     String version = properties.get("version").toString();
                     String artifactId = properties.get("artifactId").toString();
                     String groupId = properties.get("groupId").toString();
-                    String artifactComment = bundle.getSymbolicName() + " (Bundle ID:" + bundle.getBundleId() + ")";
+                    String artifactComment = bundle.getSymbolicName();
 
                     if (artifactMappings.containsKey(bundle.getSymbolicName())) {
                         ArtifactMapping artifactMapping = artifactMappings.get(bundle.getSymbolicName());
