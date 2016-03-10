@@ -17,6 +17,8 @@ public class ArtifactInformation implements Comparable<ArtifactInformation> {
 
     private String version = "";
 
+    private MavenVersion mavenVersion = new MavenVersion();
+
     private String artifactComment = "";
 
     private Bundle associatedBundle;
@@ -33,6 +35,7 @@ public class ArtifactInformation implements Comparable<ArtifactInformation> {
         this.groupId = groupId;
         this.artifactId = artifactId;
         this.version = version;
+        this.mavenVersion = new MavenVersion(version);
     }
 
     public ArtifactInformation(String groupId, String artifactId, String version, String artifactComment) {
@@ -78,6 +81,11 @@ public class ArtifactInformation implements Comparable<ArtifactInformation> {
 
     public void setVersion(String version) {
         this.version = version;
+        this.mavenVersion = new MavenVersion(version);
+    }
+
+    public MavenVersion getMavenVersion() {
+        return mavenVersion;
     }
 
     public String getDependencyPomFragment(boolean scopeProvided, String outputPrefix) {
@@ -138,6 +146,16 @@ public class ArtifactInformation implements Comparable<ArtifactInformation> {
 
     public void setAssociatedBundle(Bundle associatedBundle) {
         this.associatedBundle = associatedBundle;
+    }
+
+    public boolean isArtifactAndGroupIdEqual(ArtifactInformation otherArtifactInformation) {
+        boolean isArtifactAndGroupIdEqual = otherArtifactInformation != null;
+        isArtifactAndGroupIdEqual &= StringUtils.isNotEmpty(this.getGroupId());
+        isArtifactAndGroupIdEqual &= this.getGroupId().equals(otherArtifactInformation.getGroupId());
+        isArtifactAndGroupIdEqual &= this.getGroupId().equals(otherArtifactInformation.getGroupId());
+        isArtifactAndGroupIdEqual &= StringUtils.isNotEmpty(this.getArtifactId());
+        isArtifactAndGroupIdEqual &= this.getArtifactId().equals(otherArtifactInformation.getArtifactId());
+        return isArtifactAndGroupIdEqual;
     }
 
     @Override

@@ -127,7 +127,7 @@ public class POMGeneratorImpl implements POMGenerator {
 
     public Set<ArtifactInformation> getGeneratedDependencyList(BundleContext bundleContext) throws IOException {
 
-        Set<ArtifactInformation> dependencies = new TreeSet<ArtifactInformation>();
+        Set<ArtifactInformation> dependencies = new TreeSet<>();
 
         for (Bundle bundle : bundleContext.getBundles()) {
             Enumeration pomResourcesInBundle = bundle.findEntries("META-INF", "pom.properties", true);
@@ -181,8 +181,36 @@ public class POMGeneratorImpl implements POMGenerator {
             }
         }
 
+        filterDuplicateArtifacts(dependencies);
+
         return dependencies;
     }
+
+    /**
+     * Looks for dependencies with the same artifact id and group id and removes the duplicates with the smaller version numbers
+     *
+     * @param dependenciesToBeFiltered goeas through the list and applies the described filter
+     */
+    private void filterDuplicateArtifacts(Set<ArtifactInformation> dependenciesToBeFiltered) {
+        List<ArtifactInformation> dependenciesToBeRemoved = new ArrayList<>();
+
+        for (ArtifactInformation dependencyToBeFiltered : dependenciesToBeFiltered) {
+            boolean removeDependency = false;
+            for (ArtifactInformation dependencyArtifact : dependenciesToBeFiltered) {
+                removeDependency = dependencyArtifact.isArtifactAndGroupIdEqual(dependencyToBeFiltered) && dependencyArtifact.getMavenVersion().compareTo(dependencyToBeFiltered.getMavenVersion()) > 0;
+
+                if (removeDependency) {
+                    break;
+                }
+            }
+            if (removeDependency) {
+                dependenciesToBeRemoved.add(dependencyToBeFiltered);
+                LOGGER.debug("Will remove dependency ["+ dependencyToBeFiltered.getArtifactIdentifier() +"] because there is an identical dependency with a higher version number.");
+            }
+        }
+        dependenciesToBeFiltered.removeAll(dependenciesToBeRemoved);
+    }
+
 
     private boolean ignoreBundleFromExport(String bundleArtifactName) {
         for (Pattern bundleToBeIgnored : bundlesToBeIgnored) {
