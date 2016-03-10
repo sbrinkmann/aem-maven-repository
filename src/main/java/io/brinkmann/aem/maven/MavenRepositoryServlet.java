@@ -134,6 +134,9 @@ public class MavenRepositoryServlet extends HttpServlet {
     private ArtifactInformation extractArtifactInformationFromRequest(final HttpServletRequest request) throws ArtifactInformationCannotBeResolvedException {
         ArtifactInformation artifactInformation = new ArtifactInformation();
 
+        if(repositoryServletPath.length() == request.getRequestURI().length())
+            throw new ArtifactInformationCannotBeResolvedException();
+
         String artifactRequestInformation = request.getRequestURI().substring(repositoryServletPath.length() + 1);
         List<String> artifactRequestInformationParts = Arrays.asList(artifactRequestInformation.split("/"));
 
