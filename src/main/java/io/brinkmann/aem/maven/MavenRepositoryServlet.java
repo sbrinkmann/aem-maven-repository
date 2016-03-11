@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -44,6 +45,10 @@ public class MavenRepositoryServlet extends HttpServlet {
     @Property(name = "sling.servlet.paths", value = "/bin/maven/repository")
     private final static String PROP_REPOSITORY_SERVLET_PATH = "sling.servlet.paths";
 
+    private static final String META_PREFIX_SUFFIX = "/.meta/prefixes.txt";
+
+    private String metaPrefixPath;
+
     private String repositoryServletPath;
 
     @Reference
@@ -57,35 +62,65 @@ public class MavenRepositoryServlet extends HttpServlet {
     @Override
     protected final void doGet(final HttpServletRequest request, final HttpServletResponse response) throws IOException {
 
-        try {
-            ArtifactInformation fromRequestResolvedArtifactInformation = extractArtifactInformationFromRequest(request);
+        if (request.getRequestURI().equals(metaPrefixPath)) {
+            response.setContentType("text/plain");
+            writeMetaPrefixes(response.getWriter());
+        } else {
 
-            ArtifactInformation artifactFromApacheFelix = lookupArtifactInApacheFelix(fromRequestResolvedArtifactInformation);
+            try {
+                ArtifactInformation fromRequestResolvedArtifactInformation = extractArtifactInformationFromRequest(request);
 
-            String fileExtension = FilenameUtils.getExtension(request.getRequestURI());
+                ArtifactInformation artifactFromApacheFelix = lookupArtifactInApacheFelix(fromRequestResolvedArtifactInformation);
 
-            switch (fileExtension) {
-                case "pom":
-                    response.setContentType("text/xml;charset=UTF-8");
-                    response.getWriter().write(fromRequestResolvedArtifactInformation.getPomFile());
-                    break;
-                case "xml":
-                    response.setContentType("text/xml;charset=UTF-8");
-                    response.getWriter().write(fromRequestResolvedArtifactInformation.getMavenMetadata());
-                    break;
-                case "sha1":
-                    response.getOutputStream().write(generateSha1Hash(artifactFromApacheFelix.getAssociatedBundle()));
-                    break;
-                case "jar":
-                    response.setContentType("application/java-archive");
-                    writeBundleArtifactFile(response.getOutputStream(), artifactFromApacheFelix.getAssociatedBundle());
-                    break;
-                default:
-                    handleArtifactInformationCannotBeResolvedException(request.getRequestURI(), response.getWriter());
+                String fileExtension = FilenameUtils.getExtension(request.getRequestURI());
+
+                switch (fileExtension) {
+                    case "pom":
+                        response.setContentType("text/xml;charset=UTF-8");
+                        response.getWriter().write(fromRequestResolvedArtifactInformation.getPomFile());
+                        break;
+                    case "xml":
+                        response.setContentType("text/xml;charset=UTF-8");
+                        response.getWriter().write(fromRequestResolvedArtifactInformation.getMavenMetadata());
+                        break;
+                    case "sha1":
+                        response.getOutputStream().write(generateSha1Hash(artifactFromApacheFelix.getAssociatedBundle()));
+                        break;
+                    case "jar":
+                        response.setContentType("application/java-archive");
+                        writeBundleArtifactFile(response.getOutputStream(), artifactFromApacheFelix.getAssociatedBundle());
+                        break;
+                    default:
+                        handleArtifactInformationCannotBeResolvedException(request.getRequestURI(), response.getWriter());
+                }
+            } catch (ArtifactDoesntExistInApacheFelix | ArtifactInformationCannotBeResolvedException | NoSuchAlgorithmException ex) {
+                handleArtifactInformationCannotBeResolvedException(request.getRequestURI(), response.getWriter());
             }
-        } catch (ArtifactDoesntExistInApacheFelix | ArtifactInformationCannotBeResolvedException | NoSuchAlgorithmException ex) {
-            handleArtifactInformationCannotBeResolvedException(request.getRequestURI(), response.getWriter());
         }
+    }
+
+    private void writeMetaPrefixes(PrintWriter output) throws IOException {
+        Set<ArtifactInformation> dependencyList = pomGenerator.getGeneratedDependencyList(bundleContext);
+        Set<String> groupInformation = new TreeSet<>();
+        for (ArtifactInformation dependency : dependencyList) {
+            if (StringUtils.isNotEmpty(dependency.getGroupId())) {
+                String[] groupIdElements = dependency.getGroupId().split("\\.");
+
+                String firstTwoGroupLevels = "/" + groupIdElements[0];
+                if (groupIdElements.length >= 2) {
+                    firstTwoGroupLevels += "/" + groupIdElements[1];
+                }
+
+                groupInformation.add(firstTwoGroupLevels);
+            }
+        }
+
+        output.write("## repository-prefixes/2.0\n");
+
+        for (String prefixes : groupInformation) {
+            output.write(prefixes + "\n");
+        }
+
     }
 
     private byte[] generateSha1Hash(Bundle associatedBundle) throws IOException, NoSuchAlgorithmException {
@@ -134,7 +169,7 @@ public class MavenRepositoryServlet extends HttpServlet {
     private ArtifactInformation extractArtifactInformationFromRequest(final HttpServletRequest request) throws ArtifactInformationCannotBeResolvedException {
         ArtifactInformation artifactInformation = new ArtifactInformation();
 
-        if(repositoryServletPath.length() == request.getRequestURI().length())
+        if (repositoryServletPath.length() == request.getRequestURI().length())
             throw new ArtifactInformationCannotBeResolvedException();
 
         String artifactRequestInformation = request.getRequestURI().substring(repositoryServletPath.length() + 1);
@@ -192,6 +227,8 @@ public class MavenRepositoryServlet extends HttpServlet {
 
         final Dictionary<?, ?> properties = componentContext.getProperties();
         repositoryServletPath = (String) properties.get(PROP_REPOSITORY_SERVLET_PATH);
+
+        metaPrefixPath = repositoryServletPath + META_PREFIX_SUFFIX;
 
         try {
             httpService.registerServlet(repositoryServletPath, this, null, null);
